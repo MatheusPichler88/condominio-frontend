@@ -1,37 +1,27 @@
-import axios from "axios";
+// src/services/api.ts
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const api = axios.create({
-  // Se estiver usando o IP da rede, lembre-se de trocar aqui se necessário
   baseURL: 'http://localhost:3000',
+  timeout: 10000,
 });
 
-// Interceptor para injetar o Token em cada requisição automaticamente
+// Interceptador de requisição: adiciona o token JWT automaticamente
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
+  const token = Cookies.get('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
 
-// Opcional: Interceptor para deslogar se o token expirar (Erro 401)
+// Interceptador de resposta: redireciona para login se token expirar
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-
-        // Se não for a página de login, espera o roteador estabilizar e redireciona
-        if (window.location.pathname !== '/login') {
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 100); // 100ms é o suficiente para o Next inicializar
-        }
+      Cookies.remove('token');
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

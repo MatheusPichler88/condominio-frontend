@@ -1,70 +1,117 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import { usePathname } from "next/navigation";
+import { logout } from "@/services/auth";
+import {
+  Home, Users, Building2, Wrench, Truck, UserCheck,
+  Calendar, FileText, Receipt, LogOut,
+} from "lucide-react";
 
-type MenuItem = { name: string; href: string; color?: string };
+const navItems = [
+  { href: "/dashboard", label: "Painel", icon: Home },
+  { href: "/pessoas", label: "Pessoas", icon: Users },
+  { href: "/moradores", label: "Moradores", icon: Building2 },
+  { href: "/funcionarios", label: "Funcionários", icon: Wrench },
+  { href: "/fornecedores", label: "Fornecedores", icon: Truck },
+  { href: "/visitantes", label: "Visitantes", icon: UserCheck },
+  { href: "/unidades", label: "Unidades", icon: Building2 },
+  { href: "/areas-comuns", label: "Áreas Comuns", icon: Calendar },
+  { href: "/reservas", label: "Reservas", icon: Calendar },
+  { href: "/boletos", label: "Boletos", icon: Receipt },
+  { href: "/comunicados", label: "Comunicados", icon: FileText },
+  { href: "/contratos", label: "Contratos", icon: FileText },
+  { href: "/contas-pagar", label: "Contas a Pagar", icon: Receipt },
+  { href: "/contas-receber", label: "Contas a Receber", icon: Receipt },
+];
 
-export default function Sidebar({ items }: { items: MenuItem[] }) {
-    const path = usePathname();
-    const router = useRouter();
+export default function Sidebar() {
+  const path = usePathname();
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    };
+  return (
+    <aside
+      className="w-64 flex flex-col h-screen sticky top-0 z-50"
+      style={{
+        borderRight: "1px solid hsl(var(--border))",
+        background: "hsl(var(--card))",
+      }}
+    >
+      {/* Header */}
+      <div
+        className="p-6 flex items-center gap-3"
+        style={{ borderBottom: "1px solid hsl(var(--border))" }}
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow-lg"
+          style={{
+            background: "hsl(var(--primary))",
+            color: "hsl(var(--primary-foreground))",
+          }}
+        >
+          C
+        </div>
+        <div>
+          <p className="font-bold text-sm" style={{ color: "hsl(var(--foreground))" }}>
+            CondoAdmin
+          </p>
+          <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+            Sistema de Gestão
+          </p>
+        </div>
+      </div>
 
-    return (
-        <nav aria-label="Navegação principal" className="w-72 bg-white/90 backdrop-blur-xl border-r border-slate-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] h-screen p-6 sticky top-0 flex flex-col z-50">
-            <div className="mb-10 flex items-center gap-4 px-2">
-                <div className="w-12 h-12 bg-gradient-to-tr from-[#4A8BDF] to-[#A0006D] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#4A8BDF]/30">
-                    C
-                </div>
-                <div>
-                    <div className="text-xl font-bold text-slate-800 tracking-tight">Condo<span className="text-[#4A8BDF]">Admin</span></div>
-                    <div className="text-xs font-semibold text-[#A0006D] uppercase tracking-widest mt-0.5">Gestão Premium</div>
-                </div>
-            </div>
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
+        <p
+          className="text-[10px] font-bold uppercase tracking-widest px-3 py-2"
+          style={{ color: "hsl(var(--muted-foreground))" }}
+        >
+          Menu Principal
+        </p>
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const isActive = path === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 relative"
+              style={{
+                color: isActive ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
+                background: isActive ? "hsl(var(--secondary))" : "transparent",
+                fontWeight: isActive ? 600 : 400,
+              }}
+            >
+              {isActive && (
+                <div
+                  className="absolute left-0 top-1 bottom-1 w-0.5 rounded-r"
+                  style={{ background: "hsl(var(--primary))" }}
+                />
+              )}
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-            <div className="overflow-y-auto pr-2 -mr-2 flex-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                <ul role="menu" className="space-y-1.5">
-                    <li className="mb-4 px-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Menu Principal</li>
-                    {items.map((item) => {
-                        const isActive = path === item.href;
-                        return (
-                            <li key={item.href} role="none">
-                                <Link
-                                    href={item.href}
-                                    role="menuitem"
-                                    aria-current={isActive ? "page" : undefined}
-                                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A8BDF]/50 transition-all duration-300 relative overflow-hidden ${isActive
-                                            ? "bg-gradient-to-r from-[#4A8BDF]/10 to-transparent text-[#4A8BDF] font-semibold"
-                                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium"
-                                        }`}
-                                >
-                                    {isActive && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#4A8BDF] rounded-r-md shadow-[0_0_8px_#4A8BDF]"></div>
-                                    )}
-                                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${isActive ? "bg-[#4A8BDF] scale-125" : "bg-slate-300 group-hover:bg-[#A0006D]"}`} aria-hidden="true"></div>
-                                    <span className="tracking-wide text-sm">{item.name}</span>
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-slate-100">
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-white hover:bg-gradient-to-r hover:from-[#A0006D] hover:to-[#c40087] transition-all duration-300 focus:outline-none shadow-md shadow-transparent hover:shadow-[#A0006D]/20 group"
-                >
-                    <svg className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Sair do Sistema
-                </button>
-            </div>
-        </nav>
-    );
+      {/* Footer logout */}
+      <div className="p-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all"
+          style={{ color: "hsl(var(--muted-foreground))" }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.color = "hsl(var(--foreground))";
+            (e.currentTarget as HTMLElement).style.background = "hsl(var(--secondary))";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.color = "hsl(var(--muted-foreground))";
+            (e.currentTarget as HTMLElement).style.background = "transparent";
+          }}
+        >
+          <LogOut className="h-4 w-4" />
+          Sair do Sistema
+        </button>
+      </div>
+    </aside>
+  );
 }

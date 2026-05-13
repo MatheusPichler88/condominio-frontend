@@ -1,89 +1,137 @@
 "use client";
+
 import { useState } from "react";
-import api from "../../services/api"; 
 import { useRouter } from "next/navigation";
+import { login } from "@/services/auth";
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ CPF_CNPJ: "", password: "" });
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [form, setForm] = useState({ login: "", password: "" });
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setErro("");
+    setCarregando(true);
     try {
-      const res = await api.post("/auth/login", form);
-      const { access_token } = res.data;
-
-      localStorage.setItem("token", access_token);
+      await login(form.login, form.password);
       router.push("/dashboard");
-    } catch (error) {
-      alert("Falha no login. Verifique CPF e Senha.");
+    } catch {
+      setErro("Login ou senha inválidos.");
     } finally {
-      setLoading(false);
+      setCarregando(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-4">
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: "hsl(var(--background))" }}
+    >
       {/* Card de Login */}
-      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-        
-        {/* Banner Superior com Logo */}
-        <div className="bg-white px-8 pt-10 pb-6 text-center">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-200">
-              C
-            </div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              Condo<span className="text-blue-600">Admin</span>
-            </h1>
+      <div
+        className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+        style={{
+          background: "hsl(var(--card))",
+          border: "1px solid hsl(var(--border))",
+        }}
+      >
+        {/* Header */}
+        <div className="px-8 pt-10 pb-6 text-center">
+          <div
+            className="mx-auto mb-4 w-14 h-14 rounded-full flex items-center justify-center"
+            style={{ background: "hsl(var(--primary) / 0.2)" }}
+          >
+            <span className="text-2xl">🏢</span>
           </div>
-          <h2 className="text-xl font-semibold text-slate-900">Bem-vindo de volta</h2>
-          <p className="text-slate-500 mt-2 text-sm">Insira suas credenciais para acessar o painel.</p>
+          <h1
+            className="text-2xl font-bold"
+            style={{ color: "hsl(var(--foreground))" }}
+          >
+            Sistema de Condomínios
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
+            Faça login para acessar o painel
+          </p>
         </div>
 
         {/* Formulário */}
-        <form onSubmit={handleLogin} className="px-8 pb-10 space-y-5">
+        <form onSubmit={handleSubmit} className="px-8 pb-10 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">CPF ou CNPJ</label>
-            <input 
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: "hsl(var(--foreground))" }}
+            >
+              Login
+            </label>
+            <input
               required
-              className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800 placeholder:text-slate-400" 
-              placeholder="000.000.000-00" 
-              onChange={e => setForm({...form, CPF_CNPJ: e.target.value})}
+              placeholder="seu.login"
+              value={form.login}
+              onChange={(e) => setForm({ ...form, login: e.target.value })}
+              className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all"
+              style={{
+                background: "hsl(var(--input))",
+                border: "1px solid hsl(var(--border))",
+                color: "hsl(var(--foreground))",
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLElement).style.borderColor = "hsl(var(--ring))";
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLElement).style.borderColor = "hsl(var(--border))";
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Senha</label>
-            <input 
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: "hsl(var(--foreground))" }}
+            >
+              Senha
+            </label>
+            <input
               required
-              type="password" 
-              className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800 placeholder:text-slate-400" 
-              placeholder="••••••••" 
-              onChange={e => setForm({...form, password: e.target.value})}
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all"
+              style={{
+                background: "hsl(var(--input))",
+                border: "1px solid hsl(var(--border))",
+                color: "hsl(var(--foreground))",
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLElement).style.borderColor = "hsl(var(--ring))";
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLElement).style.borderColor = "hsl(var(--border))";
+              }}
             />
           </div>
 
-          <button 
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-[0.98] disabled:opacity-70 flex justify-center items-center"
-          >
-            {loading ? "Autenticando..." : "Entrar no Sistema"}
-          </button>
-
-          <div className="pt-4 text-center">
-            <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">
-              Sistema de Gestão Condominial
+          {erro && (
+            <p className="text-sm text-center" style={{ color: "hsl(var(--color-danger))" }}>
+              {erro}
             </p>
-          </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={carregando}
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all disabled:opacity-70"
+            style={{
+              background: "hsl(var(--primary))",
+              color: "hsl(var(--primary-foreground))",
+            }}
+          >
+            {carregando ? "Entrando..." : "Entrar"}
+          </button>
         </form>
       </div>
-
-      {/* Detalhe Decorativo de Fundo */}
-      <div className="fixed -bottom-32 -left-32 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-      <div className="fixed -top-32 -right-32 w-64 h-64 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
     </div>
   );
 }

@@ -1,190 +1,192 @@
 "use client";
 import { useState, useEffect } from "react";
-import api from "../../services/api";
-import PageLayout from "../../components/PageLayout";
+import api from "@/services/api";
+import PageLayout from "@/components/PageLayout";
+
+// Interface para organizar os dados do formulário
+interface ReservaForm {
+  ID_MORADOR: string;
+  ID_AREA_COMUM: string;
+  DATA_RESERVA: string;
+  HR_INICIO: string;
+  HR_FIM: string;
+}
+
+const inputStyle = { background: "hsl(var(--input))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" };
+const labelStyle = { color: "hsl(var(--muted-foreground))", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em" };
 
 export default function ReservasPage() {
-  const [reservas, setReservas] = useState<any[]>([]);
-  const [form, setForm] = useState({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" });
+  const [items, setItems] = useState<any[]>([]);
+  const [form, setForm] = useState<ReservaForm>({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" });
   const [editId, setEditId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "err" } | null>(null);
+
+  const showToast = (msg: string, tipo: "ok" | "err") => {
+    setToast({ msg, tipo });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => { carregar(); }, []);
 
   const carregar = async () => {
     try {
       const res = await api.get("/reservas");
-      setReservas(res.data);
-    } catch (error) {
-      console.error("Erro ao carregar reservas:", error);
-    }
+      setItems(res.data);
+    } catch { showToast("Erro ao carregar dados.", "err"); }
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); 
+    setLoading(true);
     try {
       if (editId) {
         await api.put(`/reservas/${editId}`, form);
+        showToast("Reserva atualizada!", "ok"); 
         setEditId(null);
       } else {
         await api.post("/reservas", form);
+        showToast("Reserva cadastrada!", "ok");
       }
-      setForm({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" });
+      setForm({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" }); 
       carregar();
-    } catch (error) {
-      console.error("Erro ao salvar reserva:", error);
+    } catch { 
+      showToast("Erro ao salvar.", "err"); 
+    } finally { 
+      setLoading(false); 
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Deseja excluir esta reserva?")) {
-      try {
-        await api.delete(`/reservas/${id}`);
-        carregar();
-      } catch (error) {
-        console.error("Erro ao excluir reserva:", error);
-      }
+    if (!confirm("Confirma a exclusão desta reserva?")) return;
+    try { 
+      await api.delete(`/reservas/${id}`); 
+      showToast("Excluído com sucesso.", "ok"); 
+      carregar(); 
+    } catch { 
+      showToast("Erro ao excluir.", "err"); 
     }
   };
 
-  const handleEdit = (r: any) => {
-    setForm({ ID_MORADOR: r.ID_MORADOR, ID_AREA_COMUM: r.ID_AREA_COMUM, DATA_RESERVA: r.DATA_RESERVA, HR_INICIO: r.HR_INICIO, HR_FIM: r.HR_FIM });
-    setEditId(r.ID_RESERVA);
+  const handleEdit = (row: any) => {
+    setForm({ 
+      ID_MORADOR: row.ID_MORADOR, 
+      ID_AREA_COMUM: row.ID_AREA_COMUM, 
+      DATA_RESERVA: row.DATA_RESERVA, 
+      HR_INICIO: row.HR_INICIO, 
+      HR_FIM: row.HR_FIM 
+    });
+    setEditId(row.ID_RESERVA);
   };
 
   return (
-    <PageLayout
-      title="Reservas"
-      description="Agendamento de áreas comuns para uso dos moradores."
-    >
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+    <PageLayout title="Reservas" description="Agendamento de áreas comuns para uso dos moradores.">
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg animate-in fade-in"
+          style={{ background: toast.tipo === "ok" ? "hsl(142, 71%, 35%)" : "hsl(0, 84%, 45%)", color: "white" }}>
+          {toast.msg}
+        </div>
+      )}
+
+      <div className="flex justify-between items-center mb-5">
+        <h3 className="text-lg font-bold" style={{ color: "hsl(var(--foreground))" }}>
           {editId ? "Editar Reserva" : "Nova Reserva"}
         </h3>
         {editId && (
-          <button
-            onClick={() => {
-              setEditId(null);
-              setForm({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" });
-            }}
-            className="text-sm font-bold text-slate-500 hover:text-[#A0006D] transition-colors"
+          <button 
+            onClick={() => { setEditId(null); setForm({ ID_MORADOR: "", ID_AREA_COMUM: "", DATA_RESERVA: "", HR_INICIO: "", HR_FIM: "" }); }}
+            className="text-sm font-semibold hover:underline" 
+            style={{ color: "hsl(var(--muted-foreground))" }}
           >
             Cancelar Edição
           </button>
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-10 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              ID Morador <span className="text-[#A0006D]">*</span>
-            </label>
-            <input
-              required
-              className="w-full border border-slate-200 bg-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#4A8BDF] focus:ring-4 focus:ring-[#4A8BDF]/10 transition-all font-medium text-slate-800 placeholder-slate-400"
-              placeholder="Ex: 1" value={form.ID_MORADOR}
-              onChange={e => setForm({ ...form, ID_MORADOR: e.target.value })}
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              ID Área Comum <span className="text-[#A0006D]">*</span>
-            </label>
-            <input
-              required
-              className="w-full border border-slate-200 bg-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#4A8BDF] focus:ring-4 focus:ring-[#4A8BDF]/10 transition-all font-medium text-slate-800 placeholder-slate-400"
-              placeholder="Ex: 5" value={form.ID_AREA_COMUM}
-              onChange={e => setForm({ ...form, ID_AREA_COMUM: e.target.value })}
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              Data <span className="text-[#A0006D]">*</span>
-            </label>
-            <input
-              required type="date"
-              className="w-full border border-slate-200 bg-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#4A8BDF] focus:ring-4 focus:ring-[#4A8BDF]/10 transition-all font-medium text-slate-800"
-              value={form.DATA_RESERVA}
-              onChange={e => setForm({ ...form, DATA_RESERVA: e.target.value })}
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row flex-wrap gap-4 mb-8 p-5 rounded-xl"
+        style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
+        
+        <div className="flex-1" style={{ minWidth: "140px" }}>
+          <label style={labelStyle} className="block mb-1.5">ID Morador *</label>
+          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            placeholder="Ex: 1" value={form.ID_MORADOR} onChange={(e) => setForm({ ...form, ID_MORADOR: e.target.value })} />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 w-full relative">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              Hora Início <span className="text-[#A0006D]">*</span>
-            </label>
-            <input
-              required type="time"
-              className="w-full border border-slate-200 bg-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#4A8BDF] focus:ring-4 focus:ring-[#4A8BDF]/10 transition-all font-medium text-slate-800"
-              value={form.HR_INICIO}
-              onChange={e => setForm({ ...form, HR_INICIO: e.target.value })}
-            />
-          </div>
-          <div className="flex-1 w-full relative">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              Hora Fim <span className="text-[#A0006D]">*</span>
-            </label>
-            <input
-              required type="time"
-              className="w-full border border-slate-200 bg-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#4A8BDF] focus:ring-4 focus:ring-[#4A8BDF]/10 transition-all font-medium text-slate-800"
-              value={form.HR_FIM}
-              onChange={e => setForm({ ...form, HR_FIM: e.target.value })}
-            />
-          </div>
-          <div className="md:ml-auto w-full md:w-auto mt-4 md:mt-0">
-            <button
-              type="submit"
-              className="w-full md:w-auto bg-[#4A8BDF] hover:bg-[#3a70b3] text-white px-8 py-3 rounded-xl font-bold shadow-md shadow-[#4A8BDF]/20 transition-all transform hover:-translate-y-0.5"
-            >
-              {editId ? "Atualizar" : "Salvar Reserva"}
-            </button>
-          </div>
+        <div className="flex-1" style={{ minWidth: "140px" }}>
+          <label style={labelStyle} className="block mb-1.5">ID Área Comum *</label>
+          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            placeholder="Ex: 5" value={form.ID_AREA_COMUM} onChange={(e) => setForm({ ...form, ID_AREA_COMUM: e.target.value })} />
+        </div>
+
+        <div className="flex-1" style={{ minWidth: "140px" }}>
+          <label style={labelStyle} className="block mb-1.5">Data *</label>
+          <input required type="date" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            value={form.DATA_RESERVA} onChange={(e) => setForm({ ...form, DATA_RESERVA: e.target.value })} />
+        </div>
+
+        <div className="flex-1" style={{ minWidth: "120px" }}>
+          <label style={labelStyle} className="block mb-1.5">Hora Início *</label>
+          <input required type="time" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            value={form.HR_INICIO} onChange={(e) => setForm({ ...form, HR_INICIO: e.target.value })} />
+        </div>
+
+        <div className="flex-1" style={{ minWidth: "120px" }}>
+          <label style={labelStyle} className="block mb-1.5">Hora Fim *</label>
+          <input required type="time" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            value={form.HR_FIM} onChange={(e) => setForm({ ...form, HR_FIM: e.target.value })} />
+        </div>
+
+        <div className="flex items-end">
+          <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-lg text-sm font-bold disabled:opacity-60 transition-all hover:brightness-110"
+            style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}>
+            {loading ? "Salvando..." : editId ? "Atualizar" : "Salvar"}
+          </button>
         </div>
       </form>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b-2 border-slate-100">
-              <th className="py-4 px-6 text-xs font-bold text-[#A0006D] uppercase tracking-widest bg-slate-50 rounded-tl-xl">ID Reserva</th>
-              <th className="py-4 px-6 text-xs font-bold text-[#A0006D] uppercase tracking-widest bg-slate-50">Local</th>
-              <th className="py-4 px-6 text-xs font-bold text-[#A0006D] uppercase tracking-widest bg-slate-50">Morador Solicitante</th>
-              <th className="py-4 px-6 text-xs font-bold text-[#A0006D] uppercase tracking-widest bg-slate-50">Data/Horário</th>
-              <th className="py-4 px-6 text-xs font-bold text-[#A0006D] uppercase tracking-widest bg-slate-50 text-right rounded-tr-xl">Ações Rápidas</th>
+      <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid hsl(var(--border))" }}>
+        <table className="w-full text-left text-sm">
+          <thead style={{ background: "hsl(var(--secondary))" }}>
+            <tr>
+              <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(var(--primary))" }}># Reserva</th>
+              <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(var(--primary))" }}>Local</th>
+              <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(var(--primary))" }}>Morador</th>
+              <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(var(--primary))" }}>Data / Horário</th>
+              <th className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-right" style={{ color: "hsl(var(--primary))" }}>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {reservas.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-500 font-medium">Nenhuma reserva cadastrada no calendário.</td>
-              </tr>
+            {items.length === 0 ? (
+              <tr><td colSpan={5} className="py-10 text-center text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>Nenhuma reserva encontrada.</td></tr>
             ) : (
-              reservas.map((r: any) => (
-                <tr key={r.ID_RESERVA} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
-                  <td className="py-4 px-6 font-bold text-slate-800">#{r.ID_RESERVA}</td>
-                  <td className="py-4 px-6 font-medium text-slate-800">
-                    <span className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md text-xs font-bold w-fit">
-                      Área {r.ID_AREA_COMUM}
+              items.map((row) => (
+                <tr key={row.ID_RESERVA} className="group border-b hover:bg-[hsl(var(--secondary))]" style={{ borderColor: "hsl(var(--border))" }}>
+                  <td className="px-5 py-3.5 font-bold text-[hsl(var(--muted-foreground))]">#{row.ID_RESERVA}</td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-md text-xs font-bold" style={{ background: "hsl(142,71%,45%,0.15)", color: "hsl(142,71%,70%)" }}>
+                      Área {row.ID_AREA_COMUM}
                     </span>
                   </td>
-                  <td className="py-4 px-6 font-medium text-slate-600">
-                    <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-bold w-fit">
-                      Morador {r.ID_MORADOR}
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-md text-xs font-bold" style={{ background: "hsl(217,91%,60%,0.15)", color: "hsl(217,91%,70%)" }}>
+                      Morador {row.ID_MORADOR}
                     </span>
                   </td>
-                  <td className="py-4 px-6 font-medium text-slate-600">
-                    <span className="font-bold">{r.DATA_RESERVA}</span>
-                    <span className="text-slate-400 text-sm ml-2">{r.HR_INICIO} - {r.HR_FIM}</span>
+                  <td className="px-5 py-3.5">
+                    <span className="font-medium text-[hsl(var(--foreground))]">
+                      {new Date(row.DATA_RESERVA).toLocaleDateString('pt-BR')}
+                    </span>
+                    <span className="ml-2 text-[11px] font-semibold text-[hsl(var(--muted-foreground))] uppercase">
+                      {row.HR_INICIO} – {row.HR_FIM}
+                    </span>
                   </td>
-                  <td className="py-4 px-6 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => handleEdit(r)} className="p-2 text-slate-400 hover:text-[#4A8BDF] hover:bg-[#4A8BDF]/10 rounded-lg transition-colors" title="Editar">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => handleEdit(row)} className="p-2 rounded-lg text-[hsl(263,70%,68%)]" title="Editar">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                       </button>
-                      <button onClick={() => handleDelete(r.ID_RESERVA)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      <button onClick={() => handleDelete(row.ID_RESERVA)} className="p-2 rounded-lg text-[hsl(0,84%,65%)]" title="Excluir">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                       </button>
                     </div>
                   </td>

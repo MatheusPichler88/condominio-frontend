@@ -1,5 +1,5 @@
 // src/services/dashboardService.ts
-import api from "./api";
+import api from "@/services/api";
 
 interface ContaReceber {
     VALOR?: number;
