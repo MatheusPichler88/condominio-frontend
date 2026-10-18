@@ -5,8 +5,8 @@ import PageLayout from "@/components/PageLayout";
 
 // Definição do tipo para o formulário
 interface AreaComumForm {
-  NOME_AREA: string;
-  DESCR_AREA: string;
+  NOME: string;
+  DESCRICAO_AREA: string;
   CAPACIDADE: string | number;
 }
 
@@ -15,7 +15,7 @@ const labelStyle = { color: "hsl(var(--muted-foreground))", fontSize: "0.7rem", 
 
 export default function AreasComunsPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<AreaComumForm>({ NOME_AREA: "", DESCR_AREA: "", CAPACIDADE: "" });
+  const [form, setForm] = useState<AreaComumForm>({ NOME: "", DESCRICAO_AREA: "", CAPACIDADE: "" });
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "err" } | null>(null);
@@ -46,7 +46,7 @@ export default function AreasComunsPage() {
         await api.post("/areas-comuns", form);
         showToast("Área Comum cadastrada!", "ok");
       }
-      setForm({ NOME_AREA: "", DESCR_AREA: "", CAPACIDADE: "" }); 
+      setForm({ NOME: "", DESCRICAO_AREA: "", CAPACIDADE: "" }); 
       carregar();
     } catch { 
       showToast("Erro ao salvar.", "err"); 
@@ -68,8 +68,8 @@ export default function AreasComunsPage() {
 
   const handleEdit = (row: any) => {
     setForm({ 
-      NOME_AREA: row.NOME_AREA, 
-      DESCR_AREA: row.DESCR_AREA || "", 
+      NOME: row.NOME, 
+      DESCRICAO_AREA: row.DESCRICAO_AREA || "", 
       CAPACIDADE: row.CAPACIDADE 
     });
     setEditId(row.ID_AREA_COMUM);
@@ -90,7 +90,7 @@ export default function AreasComunsPage() {
         </h3>
         {editId && (
           <button 
-            onClick={() => { setEditId(null); setForm({ NOME_AREA: "", DESCR_AREA: "", CAPACIDADE: "" }); }}
+            onClick={() => { setEditId(null); setForm({ NOME: "", DESCRICAO_AREA: "", CAPACIDADE: "" }); }}
             className="text-sm font-semibold hover:underline" 
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
@@ -105,13 +105,13 @@ export default function AreasComunsPage() {
         <div className="flex-1" style={{ minWidth: "180px" }}>
           <label style={labelStyle} className="block mb-1.5">Nome da Área *</label>
           <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Ex: Salão de Festas" value={form.NOME_AREA} onChange={(e) => setForm({ ...form, NOME_AREA: e.target.value })} />
+            placeholder="Ex: Salão de Festas" value={form.NOME} onChange={(e) => setForm({ ...form, NOME: e.target.value })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>
           <label style={labelStyle} className="block mb-1.5">Descrição</label>
           <input type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Detalhes ou regras..." value={form.DESCR_AREA} onChange={(e) => setForm({ ...form, DESCR_AREA: e.target.value })} />
+            placeholder="Detalhes ou regras..." value={form.DESCRICAO_AREA} onChange={(e) => setForm({ ...form, DESCRICAO_AREA: e.target.value })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>
@@ -146,9 +146,9 @@ export default function AreasComunsPage() {
               items.map((row) => (
                 <tr key={row.ID_AREA_COMUM} className="group transition-colors border-b hover:bg-[hsl(var(--secondary))]" style={{ borderColor: "hsl(var(--border))" }}>
                   <td className="px-5 py-3.5 font-bold text-[hsl(var(--muted-foreground))]">#{row.ID_AREA_COMUM}</td>
-                  <td className="px-5 py-3.5 text-[hsl(var(--foreground))]">{row.NOME_AREA}</td>
+                  <td className="px-5 py-3.5 text-[hsl(var(--foreground))]">{row.NOME}</td>
                   <td className="px-5 py-3.5 text-xs max-w-xs truncate text-[hsl(var(--muted-foreground))]">
-                    {row.DESCR_AREA || "-"}
+                    {row.DESCRICAO_AREA || "-"}
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="px-2.5 py-1 rounded-md text-xs font-bold" style={{ background: "hsl(142,71%,45%,0.2)", color: "hsl(142,71%,75%)" }}>
