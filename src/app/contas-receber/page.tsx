@@ -51,8 +51,8 @@ export default function ContasReceberPage() {
       }
       setForm({ ID_MORADOR: "", DESCRICAO: "", VALOR: "", DATA_VENCIMENTO: "", STATUS: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -64,8 +64,8 @@ export default function ContasReceberPage() {
       await api.delete(`/contas-receber/${id}`); 
       showToast("Excluído com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

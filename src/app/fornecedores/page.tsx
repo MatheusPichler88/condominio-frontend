@@ -48,8 +48,8 @@ export default function FornecedoresPage() {
       }
       setForm({ ID_PESSOA: "", AREA_ATUACAO: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -61,8 +61,8 @@ export default function FornecedoresPage() {
       await api.delete(`/fornecedores/${id}`); 
       showToast("Excluído com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

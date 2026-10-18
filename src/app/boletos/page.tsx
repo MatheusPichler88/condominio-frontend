@@ -50,8 +50,8 @@ export default function BoletosPage() {
       }
       setForm({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", BOLETO_STATUS: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -63,8 +63,8 @@ export default function BoletosPage() {
       await api.delete(`/boletos/${id}`); 
       showToast("Excluído com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

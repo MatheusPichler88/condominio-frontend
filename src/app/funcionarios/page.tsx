@@ -49,8 +49,8 @@ export default function FuncionariosPage() {
       }
       setForm({ ID_PESSOA: "", FUNCAO: "", DATA_ADMISSAO: "", SALARIO: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -62,8 +62,8 @@ export default function FuncionariosPage() {
       await api.delete(`/funcionarios/${id}`); 
       showToast("Excluído com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

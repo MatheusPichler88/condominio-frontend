@@ -48,8 +48,8 @@ export default function MoradoresPage() {
       }
       setForm({ ID_PESSOA: "", ID_UNIDADE: "" }); // Corrigido: Chaves simples
       carregar();
-    } catch { 
-      showToast("Erro ao salvar. Verifique os dados.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar. Verifique os dados.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -61,8 +61,8 @@ export default function MoradoresPage() {
       await api.delete(`/moradores/${id}`); 
       showToast("Excluído com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

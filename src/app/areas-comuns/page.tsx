@@ -48,8 +48,8 @@ export default function AreasComunsPage() {
       }
       setForm({ NOME: "", DESCRICAO_AREA: "", CAPACIDADE: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -61,8 +61,8 @@ export default function AreasComunsPage() {
       await api.delete(`/areas-comuns/${id}`); 
       showToast("Excluída com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 

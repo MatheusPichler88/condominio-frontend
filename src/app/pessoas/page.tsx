@@ -66,8 +66,8 @@ export default function PessoasPage() {
       }
       setForm(FORM_VAZIO);
       carregar();
-    } catch {
-      showToast("Erro ao salvar pessoa.", "err");
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || "Erro ao salvar pessoa.", "err");
     } finally {
       setLoading(false);
     }
@@ -79,8 +79,8 @@ export default function PessoasPage() {
       await api.delete(`/pessoas/${id}`);
       showToast("Pessoa excluída.", "ok");
       carregar();
-    } catch {
-      showToast("Erro ao excluir.", "err");
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err");
     }
   };
 
