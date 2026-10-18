@@ -49,8 +49,8 @@ export default function UnidadesPage() {
       }
       setForm({ NUM_UNIDADE: "", BLOCO: "", TIPO: "", AREA_TOTAL: "" }); 
       carregar();
-    } catch { 
-      showToast("Erro ao salvar.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao salvar.", "err"); 
     } finally { 
       setLoading(false); 
     }
@@ -62,8 +62,8 @@ export default function UnidadesPage() {
       await api.delete(`/unidades/${id}`); 
       showToast("Excluída com sucesso.", "ok"); 
       carregar(); 
-    } catch { 
-      showToast("Erro ao excluir.", "err"); 
+    } catch (err: any) { 
+      showToast(err?.response?.data?.message || "Erro ao excluir.", "err"); 
     }
   };
 
@@ -113,7 +113,7 @@ export default function UnidadesPage() {
         <div className="flex-1" style={{ minWidth: "150px" }}>
           <label style={labelStyle} className="block mb-1.5">Bloco *</label>
           <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Ex: Bloco A" value={form.BLOCO} onChange={(e) => setForm({ ...form, BLOCO: e.target.value })} />
+            maxLength={3} placeholder="Ex: A" value={form.BLOCO} onChange={(e) => setForm({ ...form, BLOCO: e.target.value })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "150px" }}>
