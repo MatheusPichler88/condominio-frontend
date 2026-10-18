@@ -114,8 +114,14 @@ export default function ComunicadosPage() {
 
         <div className="flex-1" style={{ minWidth: "180px" }}>
           <label style={labelStyle} className="block mb-1.5">Tipo</label>
-          <input type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Ex: Urgente, Informativo" value={form.TIPO} onChange={(e) => setForm({ ...form, TIPO: e.target.value })} />
+          <select className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
+            value={form.TIPO} onChange={(e) => setForm({ ...form, TIPO: e.target.value })}>
+            <option value="">Selecione...</option>
+            <option value="AVISO">Aviso</option>
+            <option value="COMUNICADO">Comunicado</option>
+            <option value="NOTIFICAÇÃO">Notificação</option>
+            <option value="URGENTE">Urgente</option>
+          </select>
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>
