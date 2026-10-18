@@ -135,7 +135,7 @@ export default function ContasReceberPage() {
           <select required className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
             value={form.STATUS} onChange={(e) => setForm({ ...form, STATUS: e.target.value })} >
             <option value="">Selecione...</option>
-            <option value="ABERTO">Aberto</option>
+            <option value="PENDENTE">Pendente</option>
             <option value="PAGO">Pago</option>
             <option value="ATRASADO">Atrasado</option>
           </select>
