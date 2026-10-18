@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
+import SelectRelacionado from "@/components/SelectRelacionado";
 
 // Interface para facilitar o gerenciamento do estado no TypeScript
 interface BoletoForm {
@@ -105,9 +106,8 @@ export default function BoletosPage() {
         style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
         
         <div className="flex-1" style={{ minWidth: "180px" }}>
-          <label style={labelStyle} className="block mb-1.5">ID Morador *</label>
-          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="ID" value={form.ID_MORADOR} onChange={(e) => setForm({ ...form, ID_MORADOR: e.target.value })} />
+          <label style={labelStyle} className="block mb-1.5">Morador *</label>
+          <SelectRelacionado tipo="morador" style={inputStyle} value={form.ID_MORADOR} onChange={(v) => setForm({ ...form, ID_MORADOR: v })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>

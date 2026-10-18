@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
+import SelectRelacionado from "@/components/SelectRelacionado";
 
 interface FuncionarioForm {
   ID_PESSOA: string;
@@ -101,9 +102,8 @@ export default function FuncionariosPage() {
         style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
         
         <div className="flex-1" style={{ minWidth: "180px" }}>
-          <label style={labelStyle} className="block mb-1.5">ID Pessoa *</label>
-          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="ID da Pessoa" value={form.ID_PESSOA} onChange={(e) => setForm({ ...form, ID_PESSOA: e.target.value })} />
+          <label style={labelStyle} className="block mb-1.5">Pessoa *</label>
+          <SelectRelacionado tipo="pessoa" style={inputStyle} value={form.ID_PESSOA} onChange={(v) => setForm({ ...form, ID_PESSOA: v })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>

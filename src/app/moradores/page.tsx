@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
+import SelectRelacionado from "@/components/SelectRelacionado";
 
 // Interfaces para melhor suporte do TS
 interface MoradorForm {
@@ -99,29 +100,13 @@ export default function MoradoresPage() {
         style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
         
         <div className="flex-1" style={{ minWidth: "180px" }}>
-          <label style={labelStyle} className="block mb-1.5">ID Pessoa *</label>
-          <input 
-            required 
-            type="number" // Melhor usar number para IDs
-            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" 
-            style={inputStyle}
-            placeholder="Ex: 1" 
-            value={form.ID_PESSOA} 
-            onChange={(e) => setForm({ ...form, ID_PESSOA: e.target.value })} 
-          />
+          <label style={labelStyle} className="block mb-1.5">Pessoa *</label>
+          <SelectRelacionado tipo="pessoa" style={inputStyle} value={form.ID_PESSOA} onChange={(v) => setForm({ ...form, ID_PESSOA: v })} />
         </div>
 
         <div className="flex-1" style={{ minWidth: "180px" }}>
-          <label style={labelStyle} className="block mb-1.5">ID Unidade *</label>
-          <input 
-            required 
-            type="number" 
-            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" 
-            style={inputStyle}
-            placeholder="Ex: 101" 
-            value={form.ID_UNIDADE} 
-            onChange={(e) => setForm({ ...form, ID_UNIDADE: e.target.value })} 
-          />
+          <label style={labelStyle} className="block mb-1.5">Unidade *</label>
+          <SelectRelacionado tipo="unidade" style={inputStyle} value={form.ID_UNIDADE} onChange={(v) => setForm({ ...form, ID_UNIDADE: v })} />
         </div>
 
         <div className="flex items-end">

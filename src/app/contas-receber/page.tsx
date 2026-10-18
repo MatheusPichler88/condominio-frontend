@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
+import SelectRelacionado from "@/components/SelectRelacionado";
 
 // Interface para garantir a integridade dos dados
 interface ContaReceberForm {
@@ -108,8 +109,7 @@ export default function ContasReceberPage() {
         
         <div className="flex-1" style={{ minWidth: "140px" }}>
           <label style={labelStyle} className="block mb-1.5">Morador (ID) *</label>
-          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Ex: 5" value={form.ID_MORADOR} onChange={(e) => setForm({ ...form, ID_MORADOR: e.target.value })} />
+          <SelectRelacionado tipo="morador" style={inputStyle} value={form.ID_MORADOR} onChange={(v) => setForm({ ...form, ID_MORADOR: v })} />
         </div>
 
         <div className="flex-[2]" style={{ minWidth: "200px" }}>

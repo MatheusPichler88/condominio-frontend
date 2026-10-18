@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
+import SelectRelacionado from "@/components/SelectRelacionado";
 
 // Definição de tipos para o formulário de contrato
 interface ContratoForm {
@@ -108,8 +109,7 @@ export default function ContratosPage() {
         
         <div className="flex-1" style={{ minWidth: "140px" }}>
           <label style={labelStyle} className="block mb-1.5">Fornecedor (ID) *</label>
-          <input required type="text" className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            placeholder="Ex: 3" value={form.ID_FORNECEDOR} onChange={(e) => setForm({ ...form, ID_FORNECEDOR: e.target.value })} />
+          <SelectRelacionado tipo="fornecedor" style={inputStyle} value={form.ID_FORNECEDOR} onChange={(v) => setForm({ ...form, ID_FORNECEDOR: v })} />
         </div>
 
         <div className="flex-[2]" style={{ minWidth: "200px" }}>
