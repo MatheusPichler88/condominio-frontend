@@ -8,7 +8,7 @@ interface BoletoForm {
   ID_MORADOR: string;
   VL_BOLETO: string;
   DT_VENCIMENTO: string;
-  STATUS: string;
+  BOLETO_STATUS: string;
 }
 
 const inputStyle = { background: "hsl(var(--input))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" };
@@ -16,7 +16,7 @@ const labelStyle = { color: "hsl(var(--muted-foreground))", fontSize: "0.7rem", 
 
 export default function BoletosPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<BoletoForm>({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", STATUS: "" });
+  const [form, setForm] = useState<BoletoForm>({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", BOLETO_STATUS: "" });
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "err" } | null>(null);
@@ -47,7 +47,7 @@ export default function BoletosPage() {
         await api.post("/boletos", form);
         showToast("Boleto cadastrado!", "ok");
       }
-      setForm({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", STATUS: "" }); 
+      setForm({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", BOLETO_STATUS: "" }); 
       carregar();
     } catch { 
       showToast("Erro ao salvar.", "err"); 
@@ -72,7 +72,7 @@ export default function BoletosPage() {
       ID_MORADOR: row.ID_MORADOR, 
       VL_BOLETO: row.VL_BOLETO, 
       DT_VENCIMENTO: row.DT_VENCIMENTO, 
-      STATUS: row.STATUS 
+      BOLETO_STATUS: row.BOLETO_STATUS 
     });
     setEditId(row.ID_BOLETO);
   };
@@ -92,7 +92,7 @@ export default function BoletosPage() {
         </h3>
         {editId && (
           <button 
-            onClick={() => { setEditId(null); setForm({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", STATUS: "" }); }}
+            onClick={() => { setEditId(null); setForm({ ID_MORADOR: "", VL_BOLETO: "", DT_VENCIMENTO: "", BOLETO_STATUS: "" }); }}
             className="text-sm font-semibold hover:underline" 
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
@@ -125,7 +125,7 @@ export default function BoletosPage() {
         <div className="flex-1" style={{ minWidth: "180px" }}>
           <label style={labelStyle} className="block mb-1.5">Status *</label>
           <select required className="w-full px-4 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}
-            value={form.STATUS} onChange={(e) => setForm({ ...form, STATUS: e.target.value })} >
+            value={form.BOLETO_STATUS} onChange={(e) => setForm({ ...form, BOLETO_STATUS: e.target.value })} >
             <option value="">Selecione...</option>
             <option value="ABERTO">Aberto</option>
             <option value="PAGO">Pago</option>
@@ -168,9 +168,9 @@ export default function BoletosPage() {
                   <td className="px-5 py-3.5 font-bold text-[hsl(var(--foreground))]">R$ {Number(row.VL_BOLETO).toFixed(2)}</td>
                   <td className="px-5 py-3.5">
                     <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{
-                      background: row.STATUS === "PAGO" ? "hsl(142,71%,20%)" : row.STATUS === "ATRASADO" ? "hsl(0,84%,20%)" : "hsl(38,92%,20%)",
-                      color: row.STATUS === "PAGO" ? "hsl(142,71%,75%)" : row.STATUS === "ATRASADO" ? "hsl(0,84%,75%)" : "hsl(38,92%,75%)"
-                    }}>{row.STATUS}</span>
+                      background: row.BOLETO_STATUS === "PAGO" ? "hsl(142,71%,20%)" : row.BOLETO_STATUS === "ATRASADO" ? "hsl(0,84%,20%)" : "hsl(38,92%,20%)",
+                      color: row.BOLETO_STATUS === "PAGO" ? "hsl(142,71%,75%)" : row.BOLETO_STATUS === "ATRASADO" ? "hsl(0,84%,75%)" : "hsl(38,92%,75%)"
+                    }}>{row.BOLETO_STATUS}</span>
                   </td>
                   <td className="px-5 py-3.5 text-xs text-[hsl(var(--muted-foreground))]">
                     {new Date(row.DT_VENCIMENTO).toLocaleDateString('pt-BR')}
